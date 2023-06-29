@@ -1,0 +1,52 @@
+version: '3.9'
+services:
+  app:
+    container_name: nix_app
+    environment:
+      - DB_NAME=nix_db
+      - DB_HOST=db
+      - DB_USER=admin
+      - DB_PASSWORD=password
+      - REDIS_URL=nix_redis
+      - REDIS_PORT=6379
+      - ACCESS_SECRET=access
+      - REFRESH_SECRET=refresh
+      - CLIENT_ID=173209494211-beirqlnkqlp9ck77r2ptqp7aino9anpo.apps.googleusercontent.com
+      - CLIENT_SECRET=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
+      - REDIRECT_URL=http://localhost:8080/auth/google/callback
+    build:
+      context: ../
+      dockerfile: .docker/dockerfile
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    depends_on:
+      - db
+    networks:
+      - default
+  nix_redis:
+    image: redis
+    container_name: redis_for_nix
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    networks:
+      - default
+  db:
+    image: postgres:latest
+    container_name: db_Nix_trainee_practic
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=nix_db
+      - DATABASE_HOST=localhost:8081
+    ports:
+      - '8081:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
+volumes:
+  db:
+
+networks:
+  default:
+    driver: bridge
